@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import {
   Play,
   Trash2,
-  Maximize2,
-  Minimize2,
   Sun,
   Moon,
   Code,
@@ -16,65 +14,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Button } from "./components/button";
 import { Textarea } from "./components/textarea";
 import { Separator } from "./components/seperator";
+import { useLanguageStore } from "../store/compiler";
 
 function App() {
-  const languages = [
-    { value: "javascript", label: "JavaScript", extension: "js" },
-    { value: "python", label: "Python", extension: "py" },
-    { value: "java", label: "Java", extension: "java" },
-    { value: "cpp", label: "C++", extension: "cpp" },
-    { value: "c", label: "C", extension: "c" },
-    { value: "csharp", label: "C#", extension: "cs" },
-    { value: "go", label: "Go", extension: "go" },
-    { value: "rust", label: "Rust", extension: "rs" },
-    { value: "php", label: "PHP", extension: "php" },
-    { value: "ruby", label: "Ruby", extension: "rb" },
-  ];
+  const { language, fetchLanguages } = useLanguageStore();
+
+   useEffect(() => {
+    fetchLanguages();
+  }, []);
 
   const defaultCode = {
-    javascript: `// Welcome to the Online Code Compiler
-console.log("Hello, World!");
-
-function fibonacci(n) {
-    if (n <= 1) return n;
-    return fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-console.log("Fibonacci sequence:");
-for (let i = 0; i < 10; i++) {
-    console.log(\`F(\${i}) = \${fibonacci(i)}\`);
-}`,
-    python: `# Welcome to the Online Code Compiler
-print("Hello, World!")
-
-def fibonacci(n):
-    if n <= 1:
-        return n
-    return fibonacci(n - 1) + fibonacci(n - 2)
-
-print("Fibonacci sequence:")
-for i in range(10):
-    print(f"F({i}) = {fibonacci(i)}")`,
-    java: `// Welcome to the Online Code Compiler
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-        
-        System.out.println("Fibonacci sequence:");
-        for (int i = 0; i < 10; i++) {
-            System.out.println("F(" + i + ") = " + fibonacci(i));
-        }
-    }
-    
-    public static int fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
-    }
-}`,
+    javascript: ` Welcome to the Online Code Compiler Please select a language and start coding!`,
   };
 
   const [isDark, setIsDark] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [code, setCode] = useState(defaultCode.javascript);
   const [output, setOutput] = useState("");
@@ -249,23 +202,17 @@ Execution time: 0.234s`;
     setIsDark(!isDark);
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
 
   const copyCode = () => {
     navigator.clipboard.writeText(code);
   };
 
   const downloadCode = () => {
-    const selectedLang = languages.find(
-      (lang) => lang.value === selectedLanguage
-    );
     const blob = new Blob([code], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `code.${selectedLang?.extension || "txt"}`;
+    a.download = `code.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -281,9 +228,7 @@ Execution time: 0.234s`;
   return (
     <>
       <div
-        className={`min-h-screen transition-colors duration-200 ${themeClasses} ${
-          isFullscreen ? "fixed inset-0 z-50" : ""
-        }`}
+        className={`min-h-screen transition-colors duration-200 ${themeClasses}`}
       >
         {/* Header */}
         <div
@@ -317,9 +262,9 @@ Execution time: 0.234s`;
                       : "bg-white border-gray-300"
                   }
                 >
-                  {languages.map((lang) => (
-                    <SelectItem key={lang.value} value={lang.value}>
-                      {lang.label}
+                  {language.map((lang) => (
+                    <SelectItem key={lang.id} value={lang.name}>
+                      {lang.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -345,7 +290,7 @@ Execution time: 0.234s`;
                   isDark ? "hover:bg-[#2d2d30]" : "hover:bg-gray-100"
                 }`}
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-10 h-4" />
               </Button>
               <Button
                 variant="ghost"
@@ -359,20 +304,6 @@ Execution time: 0.234s`;
                   <Sun className="w-4 h-4" />
                 ) : (
                   <Moon className="w-4 h-4" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleFullscreen}
-                className={`${
-                  isDark ? "hover:bg-[#2d2d30]" : "hover:bg-gray-100"
-                }`}
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="w-4 h-4" />
-                ) : (
-                  <Maximize2 className="w-4 h-4" />
                 )}
               </Button>
             </div>
@@ -401,8 +332,8 @@ Execution time: 0.234s`;
                   }`}
                 >
                   {
-                    languages.find((lang) => lang.value === selectedLanguage)
-                      ?.label
+                    language.find((lang) => lang.name === selectedLanguage)
+                      ?.name
                   }
                 </span>
               </div>
