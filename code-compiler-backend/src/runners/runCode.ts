@@ -19,9 +19,9 @@ const languageConfigs = {
     command: (filename: string) =>
       `sh -c "npm install -g ts-node typescript && ts-node ${filename}"`,
   },
-  py: {
+  python: {
     extension: ".py",
-    dockerImage: "python:3.11",
+    dockerImage: "python:3.11-alpine",
     command: (filename: string) => `python ${filename}`,
   },
   java: {
@@ -30,7 +30,7 @@ const languageConfigs = {
     command: (filename: string) =>
       `sh -c "javac ${filename} && java ${filename.replace(".java", "")}"`,
   },
-  cpp: {
+  "c++": {
     extension: ".cpp",
     dockerImage: "gcc:13.2.0",
     command: (filename: string) =>
