@@ -7,7 +7,7 @@ export const compileCode = async (
   next: NextFunction
 ) => {
   try {
-    const { language, code } = req.body;
+    const { language_id:language, source_code:code } = req.body;
     const result = await runCodeInDocker({ language, code });
     res.json(result);
   } catch (error) {

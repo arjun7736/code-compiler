@@ -10,18 +10,24 @@ import {
   Copy,
   Download,
 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./components/select";
 import { Button } from "./components/button";
 import { Textarea } from "./components/textarea";
 import { Separator } from "./components/seperator";
 import { useLanguageStore } from "../store/compiler";
 
 function App() {
-  const { language, fetchLanguages } = useLanguageStore();
+  const { language, fetchLanguages, submitCode } = useLanguageStore();
 
-   useEffect(() => {
+  useEffect(() => {
     fetchLanguages();
-  }, []);
+  }, [fetchLanguages]);
 
   const defaultCode = {
     javascript: ` Welcome to the Online Code Compiler Please select a language and start coding!`,
@@ -156,6 +162,7 @@ function App() {
       }
     }
   };
+
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
     setCode(
@@ -167,29 +174,18 @@ function App() {
 
   const handleRun = async () => {
     setIsRunning(true);
-    // Simulate code execution
-    setTimeout(() => {
-      const mockOutput = `Executing ${selectedLanguage} code...
-Hello, World!
-Fibonacci sequence:
-F(0) = 0
-F(1) = 1
-F(2) = 1
-F(3) = 2
-F(4) = 3
-F(5) = 5
-F(6) = 8
-F(7) = 13
-F(8) = 21
-F(9) = 34
 
-Process finished with exit code 0
-Execution time: 0.234s`;
-      setOutput(mockOutput);
-      setIsRunning(false);
-    }, 1500);
+
+    try {
+      const result = await submitCode(code ,selectedLanguage.toLowerCase());
+      setOutput(result || "No output received");
+    } catch (err) {
+      console.error(err);
+      setOutput("Error while running code");
+    }
+
+    setIsRunning(false);
   };
-
   const clearCode = () => {
     setCode("");
   };
@@ -201,7 +197,6 @@ Execution time: 0.234s`;
   const toggleTheme = () => {
     setIsDark(!isDark);
   };
-
 
   const copyCode = () => {
     navigator.clipboard.writeText(code);
@@ -224,7 +219,6 @@ Execution time: 0.234s`;
   const editorTheme = isDark
     ? "bg-[#1e1e1e] text-[#d4d4d4] border-[#3e3e42]"
     : "bg-[#fafafa] text-gray-900 border-gray-300";
-
   return (
     <>
       <div
@@ -422,7 +416,7 @@ Execution time: 0.234s`;
                   isDark ? "text-[#cccccc]" : "text-gray-800"
                 }`}
               >
-                {output || (
+                {output?.stdout || (
                   <div
                     className={`${
                       isDark ? "text-[#6a6a6a]" : "text-gray-500"

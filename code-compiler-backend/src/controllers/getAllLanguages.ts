@@ -7,8 +7,8 @@ export const getLanguages = async (
   next: NextFunction
 ) => {
   try {
-   const languages = getAllLanguages();
-    res.json(languages);
+    const languages = getAllLanguages();
+    res.status(200).json(languages);
   } catch (error) {
     next(error);
   }

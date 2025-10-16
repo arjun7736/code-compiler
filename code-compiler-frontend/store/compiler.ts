@@ -1,4 +1,3 @@
-// src/store/languageStore.ts
 import { create } from "zustand";
 import axios from "axios";
 
@@ -10,6 +9,7 @@ interface Languages {
 interface LanguageStore {
   language: Languages[];
   fetchLanguages: () => void;
+  submitCode:(code:string,language:string)=>Promise<string>
 }
 
 export const useLanguageStore = create<LanguageStore>((set) => ({
@@ -22,12 +22,12 @@ export const useLanguageStore = create<LanguageStore>((set) => ({
       console.error("Failed to fetch languages from Judge0 API", error);
     }
   },
-  submitCode:async(code:string,languageId:number) => {
+  submitCode:async(code:string,language:string) => {
     try {
       const response = await axios.post("http://localhost:3001/api/compiler/run", {
         source_code: code,
-        language_id: languageId,
-      });
+        language_id: language,
+      });      
       return response.data;
     } catch (error) {
       console.error("Failed to submit code to Judge0 API", error);
