@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import compilerRoutes from "./routes/compilerRoutes";
 import cors from "cors"
+import prePullImages from "./utils/pre-pull-images";
 
 dotenv.config();
 
@@ -15,4 +16,6 @@ app.use(morgan("dev"));
 
 app.use("/api/compiler",compilerRoutes);
 
+// Call pre-pull images on startup
+prePullImages();
 export default app;

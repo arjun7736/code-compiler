@@ -10,26 +10,22 @@ const execAsync = util.promisify(exec);
 const languageConfigs = {
   js: {
     extension: ".js",
-    dockerImage: "node:18",
+    dockerImage: "node:22-alpine",
     command: (filename: string) => `node ${filename}`,
-  },
-  ts: {
-    extension: ".ts",
-    dockerImage: "node:18",
-    command: (filename: string) =>
-      `sh -c "npm install -g ts-node typescript && ts-node ${filename}"`,
   },
   python: {
     extension: ".py",
     dockerImage: "python:3.11-alpine",
     command: (filename: string) => `python ${filename}`,
   },
-  java: {
-    extension: ".java",
-    dockerImage: "openjdk:21",
-    command: (filename: string) =>
-      `sh -c "javac ${filename} && java ${filename.replace(".java", "")}"`,
+ java: {
+  extension: ".java",
+  dockerImage: "eclipse-temurin:21-alpine",
+  command: (filename: string) => {
+    const className = filename.replace(".java", "");
+    return `sh -c "javac ${filename} && java ${className}"`;
   },
+},
   "c++": {
     extension: ".cpp",
     dockerImage: "gcc:13.2.0",
@@ -50,7 +46,15 @@ export const runCodeInDocker = async ({
   const config = languageConfigs[language];
   if (!config) throw new Error("Unsupported language");
 
-  const filename = `code-${randomUUID()}${config.extension}`;
+  let filename = language === "java"? "Main.java": `code-${randomUUID()}${config.extension}`;
+  
+  if (language === "java") {
+  const match = code.match(/public\s+class\s+(\w+)/);
+
+  if (match) {
+    filename = `${match[1]}.java`;
+  }
+}
 
   // Use home folder instead of /tmp for Snap Docker compatibility
   const baseTempDir = path.join(os.homedir(), "sandbox-runs");

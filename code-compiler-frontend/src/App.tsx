@@ -416,7 +416,7 @@ function App() {
                   isDark ? "text-[#cccccc]" : "text-gray-800"
                 }`}
               >
-                {output?.stdout || (
+                {(output?.stdout ||output?.stderr) ||(
                   <div
                     className={`${
                       isDark ? "text-[#6a6a6a]" : "text-gray-500"
