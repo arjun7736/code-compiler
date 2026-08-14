@@ -4,6 +4,7 @@ import morgan from "morgan";
 import compilerRoutes from "./routes/compilerRoutes";
 import cors from "cors"
 import prePullImages from "./utils/pre-pull-images";
+import { whySlow } from "why-api-slow";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+app.use(whySlow())
 
 app.use("/api/compiler",compilerRoutes);
 
