@@ -20,5 +20,10 @@ export const getAllLanguages = () => {
       name: "Python",
       extension: ".py",
     },
+    {
+      id: 5,
+      name: "Web",
+      extension: ".web",
+    },
   ];
 };
